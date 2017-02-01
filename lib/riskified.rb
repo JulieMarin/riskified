@@ -20,7 +20,10 @@ module Riskified
     API_URL = "http://riskified.com"
 
     base_uri API_URL
-    adapter = Riskified::Adapter::Spree
+
+    def adapter
+      Riskified::Adapter::Spree
+    end
 
     def headers
       {
@@ -37,7 +40,7 @@ module Riskified
     def create(order)
       post(
         "/api/create",
-        query: {order: adapter.new(order).to_json},
+        query: {order: adapter.new(order).as_json},
         headers: headers
       )
     end
@@ -45,7 +48,7 @@ module Riskified
     def submit(order)
       post(
         "/api/submit",
-        query: {order: adapter.new(order).to_json},
+        query: {order: adapter.new(order).as_json},
         headers: headers
       )
     end
@@ -53,7 +56,7 @@ module Riskified
     def update(order)
       post(
         "/api/create",
-        query: {order: adapter.new(order).to_json},
+        query: {order: adapter.new(order).as_json},
         headers: headers
       )
     end
@@ -62,7 +65,7 @@ module Riskified
     def checkout_denied(order, resp)
       post(
         "/api/checkout_denied",
-        query: {checkout: adapter.new(order).as_checkout(resp).to_json},
+        query: {checkout: adapter.new(order).as_checkout(resp).as_json},
         headers: headers
       )
     end

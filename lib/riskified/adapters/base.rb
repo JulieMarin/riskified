@@ -9,10 +9,6 @@ module Riskified
       def as_json
         @adapted_order.as_json
       end
-
-      def to_json
-        as_json.to_json
-      end
     end
   end
 end
