@@ -44,8 +44,16 @@ module Riskified
       self
     end
 
+    def adapt_order
+      adapter.new(order).as_json
+    end
+
+    def adapt_checkout
+      adapter.new(order).as_checkout(resp).as_json
+    end
+
     def create(order)
-      data = {order: adapter.new(order)}.to_json
+      data = {order: adapt_order}.to_json
       self.class.post(
         "/api/create",
         body: data,
@@ -54,7 +62,7 @@ module Riskified
     end
 
     def submit(order)
-      data = {order: adapter.new(order)}.to_json
+      data = {order: adapt_order}.to_json
       self.class.post(
         "/api/submit",
         body: data,
@@ -63,7 +71,7 @@ module Riskified
     end
 
     def update(order)
-      data = {order: adapter.new(order)}.to_json
+      data = {order: adapt_order}.to_json
       self.class.post(
         "/api/create",
         body: data,
@@ -73,7 +81,7 @@ module Riskified
 
     # optional
     def checkout_denied(order, resp)
-      data = {checkout: adapter.new(order).as_checkout(resp)}.to_json
+      data = {checkout: adapt_checkout}.to_json
       self.class.post(
         "/api/checkout_denied",
         body: data,
@@ -84,8 +92,7 @@ module Riskified
     private
 
     def calc_hmac(body)
-      digest = OpenSSL::Digest.new('sha256')
-      hmac = OpenSSL::HMAC.hexdigest(digest, ENV["RISKIFIED_AUTH_TOKEN"], body.to_json)
+      hmac = OpenSSL::HMAC.hexdigest('SHA256', ENV["RISKIFIED_AUTH_TOKEN"], body)
     end
   end
 end
