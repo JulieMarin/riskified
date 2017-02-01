@@ -1,8 +1,8 @@
 # Riskified
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/riskified`. To experiment with that code, run `bin/console` for an interactive prompt.
+Use riskified with Ruby and Spree. Don't want to use this with Spree? Make your own adapter in `riskified/adapters/`.
 
-TODO: Delete this and the text above, and describe your gem
+TODO: test
 
 ## Installation
 
@@ -21,13 +21,14 @@ Or install it yourself as:
     $ gem install riskified
 
 ## Usage
+    # send spree order to riskified
     $ require 'riskified'
     $ client = Riskified::Client.new
     $ resp = client.create(Spree::Order.last)
     
-    # serialize spree order
+    # serialize spree order to Riskified API format
     $ o = Spree::Order.where.not(completed_at: nil).first
-    $ a = Riskfied::Adapter::Spree.new(o)
+    $ a = Riskified::Adapter::Spree.new(o)
     $ a.to_json 
 
 

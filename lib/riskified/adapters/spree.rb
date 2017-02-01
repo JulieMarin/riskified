@@ -74,7 +74,7 @@ module Riskified::Adapter
 
     def adapt_payment_details
       p = first_completed_payment
-      if p.source.is_a?(Spree::CreditCard)
+      if p.source.is_a?("Spree::CreditCard".constantize)
         credit_card = p.source
         Riskified::Adapter::CreditCardPaymentDetails.new(
           credit_card_bin: credit_card.bin,
@@ -83,7 +83,7 @@ module Riskified::Adapter
           credit_card_number: cc_number(credit_card),
           credit_card_company: credit_card.cc_type
           )
-      elsif p.source.is_a?(PAYPAL_SOURCE.constantize)
+      elsif p.source.is_a?(Riskified::Adapter::Spree::PAYPAL_SOURCE.constantize)
         paypal = p.source
         Riskified::Adapter::PaypalPaymentDetails.new(
           payer_email: paypal.payer_email,
@@ -94,7 +94,7 @@ module Riskified::Adapter
       end
     end
 
-    def first_purchase_at
+    def first_purchase_at(user)
       first_purchase = user.orders.where.not(completed_at: nil)
         .order("created_at ASC")
         .first
@@ -110,13 +110,14 @@ module Riskified::Adapter
         last_name: user.last_name,
         id: user.id,
         created_at: user.created_at.to_datetime,
-        first_purchase_at: first_purchase_at, #optional
+        first_purchase_at: first_purchase_at(user), #optional
         orders_count: user.orders.where(state: "completed").count,
         verified_email: user.confirmed_at.present?
         )
     end
 
     def adapt_address(address)
+      return nil if address.nil?
       Riskified::Adapter::Address.new(
         first_name: address.firstname,
         last_name: address.lastname,
