@@ -1,6 +1,13 @@
 module Riskified
   module Adapter
-    Order = Struct.new(
+    class KeywordStruct < Struct
+      def initialize(**kwargs)
+        super(kwargs.keys)
+        kwargs.each { |k, v| self[k] = v }
+      end
+    end
+    
+    Order = KeywordStruct.new(
       :id,
       :checkout_id, #optional
       :name,
@@ -34,7 +41,7 @@ module Riskified
       :client_details, #optional [ClientDetails]
       :charge_free_payment_details #optional
       )
-    LineItem = Struct.new(
+    LineItem = KeywordStruct.new(
       :price,
       :quantity,
       :title,
@@ -45,16 +52,16 @@ module Riskified
       :brand,
       :product_type
       )
-    DiscountCode = Struct.new(
+    DiscountCode = KeywordStruct.new(
       :amount,
       :code
       )
-    ShippingLine = Struct.new(
+    ShippingLine = KeywordStruct.new(
       :price,
       :title,
       :code #optional
       )
-    CreditCardPaymentDetails = Struct.new(
+    CreditCardPaymentDetails = KeywordStruct.new(
       :credit_card_bin,
       :avs_result_code,
       :cvv_result_code,
@@ -63,13 +70,13 @@ module Riskified
       :authorization_id, #optional
       :authorization_error #optional AuthorizationError
       )
-    PaypalPaymentDetails = Struct.new(
+    PaypalPaymentDetails = KeywordStruct.new(
       :payer_email,
       :payer_status,
       :payer_address_status,
       :protection_eligibility
       )
-    Customer = Struct.new(
+    Customer = KeywordStruct.new(
       :email,
       :first_name,
       :last_name,
@@ -80,12 +87,12 @@ module Riskified
       :verified_email,
       :social #optional [Social]
       )
-    Social = Struct.new(
+    Social = KeywordStruct.new(
       :network,
       :public_username,
       :account_url
       )
-    Address = Struct.new(
+    Address = KeywordStruct.new(
       :first_name,
       :last_name,
       :address1,
@@ -99,11 +106,11 @@ module Riskified
       :province_code, #optional
       :zip #optional
       )
-    ClientDetails = Struct.new(
+    ClientDetails = KeywordStruct.new(
       :accept_language, #optional
       :user_agent #optional
       )
-    AuthorizationError = Struct.new(
+    AuthorizationError = KeywordStruct.new(
       :created_at,
       :error_code,
       :message #optional

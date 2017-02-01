@@ -78,6 +78,7 @@ module Riskified::Adapter
 
     def adapt_payment_details
       p = first_completed_payment
+      return nil unless p
       if p.source.is_a?("Spree::CreditCard".constantize)
         credit_card = p.source
         Riskified::Adapter::CreditCardPaymentDetails.new(
@@ -98,6 +99,14 @@ module Riskified::Adapter
       end
     end
 
+    def authorization_error_code(resp)
+      begin
+        resp.message.split(" ").last.gsub('(','').gsub(')','')
+      rescue NoMethodError
+        nil
+      end
+    end
+
     def adapt_payment_details_for_checkout(resp)
       p = current_payment
       if p.source.is_a?("Spree::CreditCard".constantize)
@@ -109,8 +118,8 @@ module Riskified::Adapter
           credit_card_number: cc_number(credit_card),
           credit_card_company: credit_card.cc_type,
           authorization_error: Riskified::Adapter::AuthorizationError.new(
-            created_at: Time.now.to_datetime, #todo
-            error_code: resp.params['message']
+            created_at: DateTime.now, #todo
+            error_code: authorization_error_code(resp)
             )
           )
       end
@@ -188,7 +197,8 @@ module Riskified::Adapter
         payment_details: adapt_payment_details,
         customer: adapt_customer,
         billing_address: adapt_address(@order.billing_address),
-        shipping_address: adapt_address(@order.shipping_address)
+        shipping_address: adapt_address(@order.shipping_address),
+        checkout_id: checkout_id
         )
     end
 
@@ -198,10 +208,11 @@ module Riskified::Adapter
       "#{@order.id}-#{addr_id}-#{payment_id}"
     end
 
-    def adapt_to_checkout(resp)
+    def as_checkout(resp)
       @checkout ||= adapt
       @checkout.id = checkout_id
       @checkout.payment_details = adapt_payment_details_for_checkout(resp)
+      @checkout
     end
   end
 end

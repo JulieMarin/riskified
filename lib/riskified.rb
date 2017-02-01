@@ -60,11 +60,11 @@ module Riskified
 
     # optional
     def checkout_denied(order, resp)
-      checkout_error = gateway_error
       post(
         "/api/checkout_denied",
-        query: {checkout: adapter.new(order).adapt_to_checkout(resp).to_json},
+        query: {checkout: adapter.new(order).as_checkout(resp).to_json},
         headers: headers
       )
+    end
   end
 end
