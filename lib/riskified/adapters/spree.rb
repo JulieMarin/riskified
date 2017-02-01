@@ -212,7 +212,7 @@ module Riskified::Adapter
       @checkout ||= adapt
       @checkout.id = checkout_id
       @checkout.payment_details = adapt_payment_details_for_checkout(resp)
-      @checkout
+      @checkout.as_json
     end
   end
 end

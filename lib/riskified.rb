@@ -20,12 +20,15 @@ module Riskified
 
     API_URL = "https://sandbox.riskified.com"
 
+    base_uri API_URL
+
     def adapter
       Riskified::Adapter::Spree
     end
 
     def headers(body)
       {
+        "Content-Type" => "application/json",
         "ACCEPT" => "application/vnd.riskified.com; version=2",
         "X-RISKIFIED-SHOP-DOMAIN" => ENV["RISKIFIED_SHOP_DOMAIN"],
         "X-RISKIFIED-HMAC-SHA256" => calc_hmac(body)
@@ -33,47 +36,47 @@ module Riskified
     end
 
     def initialize(sandbox=true)
-      if sandbox
+      if sandbox == false
         self.class.class_eval do
-          base_uri "https://sandbox.riskified.com"
+          base_uri "https://production.riskified.com"
         end
       end
       self
     end
 
     def create(order)
-      data = {order: adapter.new(order).as_json}
-      post(
+      data = {order: adapter.new(order)}.to_json
+      self.class.post(
         "/api/create",
-        query: data,
+        body: data,
         headers: headers(data)
       )
     end
 
     def submit(order)
-      data = {order: adapter.new(order).as_json}
-      post(
+      data = {order: adapter.new(order)}.to_json
+      self.class.post(
         "/api/submit",
-        query: data,
+        body: data,
         headers: headers(data)
       )
     end
 
     def update(order)
-      data = {order: adapter.new(order).as_json}
-      post(
+      data = {order: adapter.new(order)}.to_json
+      self.class.post(
         "/api/create",
-        query: data,
+        body: data,
         headers: headers(data)
       )
     end
 
     # optional
     def checkout_denied(order, resp)
-      data = {checkout: adapter.new(order).as_checkout(resp).as_json}
-      post(
+      data = {checkout: adapter.new(order).as_checkout(resp)}.to_json
+      self.class.post(
         "/api/checkout_denied",
-        query: data,
+        body: data,
         headers: headers(data)
       )
     end
@@ -82,7 +85,7 @@ module Riskified
 
     def calc_hmac(body)
       digest = OpenSSL::Digest.new('sha256')
-      hmac = OpenSSL::HMAC.hexdigest(digest, ENV["RISKIFIED_AUTH_TOKEN"], body)
+      hmac = OpenSSL::HMAC.hexdigest(digest, ENV["RISKIFIED_AUTH_TOKEN"], body.to_json)
     end
   end
 end
