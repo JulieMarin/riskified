@@ -26,7 +26,7 @@ Or install it yourself as:
     $ client = Riskified::Client.new
     $ o = Spree::Order.where.not(completed_at: nil).last
     $ resp = client.create(o)
-    # => {"order"=>{"status"=>"submitted", "id"=>"XXX", "description"=>"Under review by Riskified"}}
+    # => {"order"=>{"status"=>"submitted", "id"=>"123", "description"=>"Under review by Riskified"}}
     
     # serialize spree order to Riskified API format
     $ o = Spree::Order.where.not(completed_at: nil).last

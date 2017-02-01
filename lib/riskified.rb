@@ -44,16 +44,16 @@ module Riskified
       self
     end
 
-    def adapt_order
+    def adapt_order(order)
       adapter.new(order).as_json
     end
 
-    def adapt_checkout
+    def adapt_checkout(order)
       adapter.new(order).as_checkout(resp).as_json
     end
 
     def create(order)
-      data = {order: adapt_order}.to_json
+      data = {order: adapt_order(order)}.to_json
       self.class.post(
         "/api/create",
         body: data,
@@ -62,7 +62,7 @@ module Riskified
     end
 
     def submit(order)
-      data = {order: adapt_order}.to_json
+      data = {order: adapt_order(order)}.to_json
       self.class.post(
         "/api/submit",
         body: data,
@@ -71,7 +71,7 @@ module Riskified
     end
 
     def update(order)
-      data = {order: adapt_order}.to_json
+      data = {order: adapt_order(order)}.to_json
       self.class.post(
         "/api/create",
         body: data,
@@ -81,7 +81,7 @@ module Riskified
 
     # optional
     def checkout_denied(order, resp)
-      data = {checkout: adapt_checkout}.to_json
+      data = {checkout: adapt_checkout(order)}.to_json
       self.class.post(
         "/api/checkout_denied",
         body: data,

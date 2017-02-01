@@ -40,11 +40,11 @@ module Riskified::Adapter
       @order.adjustments
         .where(source_type: ['Spree::PromotionAction'])
         .eligible
-        .map {|a| a.source.promotion }
-        .map {|p|
+        .map {|a| {adj: a, promo: a.source.promotion} }
+        .map {|h|
           Riskified::Adapter::DiscountCode.new(
-            amount: a.amount.to_f.abs,
-            code: p.code
+            amount: h[:adj].amount.to_f.abs,
+            code: h[:promo].code
           )
         }
     end
