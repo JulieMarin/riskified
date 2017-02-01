@@ -1,5 +1,3 @@
-autoload :BaseAdapter, "riskified/adapters/base"
-
 module Riskified::Adapter
   class Spree < Base
     PAYPAL_SOURCE = "Spree::PaypalExpressCheckout"

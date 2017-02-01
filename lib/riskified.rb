@@ -5,9 +5,9 @@ require "spree_core"
 
 Dotenv.load
 
-autoload :Adapter, "riskified/adapter"
-autoload :BaseAdapter, "riskified/adapters/base"
-autoload :SpreeAdapter, "riskified/adapters/spree"
+require "riskified/adapter"
+require "riskified/adapters/base"
+require "riskified/adapters/spree"
 
 module Riskified
   BRAND = "DSTLD"
