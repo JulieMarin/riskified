@@ -68,8 +68,12 @@ module Riskified::Adapter
       end
     end
 
+    def first_completed_payment
+      @order.payments.where(state: "completed").first
+    end
+
     def adapt_payment_details
-      p = @order.payments.where(state: "completed").first
+      p = first_completed_payment
       if p.source.is_a?(Spree::CreditCard)
         credit_card = p.source
         CreditCardPaymentDetails.new(
@@ -133,6 +137,14 @@ module Riskified::Adapter
       Riskified::DEFAULT_REFERRER
     end
 
+    def gateway
+      if first_completed_payment
+        first_completed_payment.payment_method.name
+      else
+        nil
+      end
+    end
+
     def adapt
       @adapted_order ||= Order.new(
         id: @order.id,
@@ -141,7 +153,7 @@ module Riskified::Adapter
         created_at: @order.created_at.to_datetime,
         currency: @order.currency,
         updated_at: @order.updated_at.to_datetime,
-        gateway: @order.payment_method.name,
+        gateway: gateway,
         browser_ip: @order.current_sign_in_ip || @order.last_ip_address,
         total_price: @order.total.to_f,
         total_discounts: @order.promo_total.to_f,
