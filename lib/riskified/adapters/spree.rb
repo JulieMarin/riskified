@@ -1,5 +1,7 @@
+autoload :BaseAdapter, "riskified/adapters/base"
+
 module Riskified::Adapter
-  class Spree < RiskifiedOrder
+  class Spree < Base
     PAYPAL_SOURCE = "Spree::PaypalExpressCheckout"
 
     def determine_product_type(product)
@@ -23,14 +25,14 @@ module Riskified::Adapter
     def adapt_line_items
       @order.line_items.map { |li|
         LineItem.new(
-          price: li.price.to_f
-          quantity: li.quantity
+          price: li.price.to_f,
+          quantity: li.quantity,
           title: li.name,
-          product_id: li.product.id
-          sku: li.sku
+          product_id: li.product.id,
+          sku: li.sku,
           category: line_item_category(li), 
           sub_category: line_item_category(li, "DESC"),
-          brand: Riskified::BRAND
+          brand: Riskified::BRAND,
           product_type: determine_product_type(li.product)
           )
       }
@@ -54,7 +56,7 @@ module Riskified::Adapter
         shipping_rate = s.shipping_rates.select {|sr| sr.shipping_method_id == s.shipping_method.id}.first
 
         ShippingLine.new(
-          price: shipping_rate.cost.to_f
+          price: shipping_rate.cost.to_f,
           title: s.shipping_method.name
         )
       }

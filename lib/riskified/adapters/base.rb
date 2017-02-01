@@ -1,5 +1,5 @@
-module Spree::Adapter
-  class RiskifiedOrder
+module Riskified::Adapter
+  class Base
     def initialize(order)
       @order = order
       adapt

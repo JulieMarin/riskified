@@ -1,6 +1,11 @@
 require "riskified/version"
 require "dotenv/load"
 require "httparty"
+require "spree_core"
+
+autoload :Adapter, "riskified/adapter"
+autoload :BaseAdapter, "riskified/adapters/base"
+autoload :SpreeAdapter, "riskified/adapters/spree"
 
 module Riskified
   BRAND = "DSTLD"
@@ -13,17 +18,17 @@ module Riskified
     API_URL = "http://riskified.com"
 
     base_uri API_URL
-    adapter = Adapter::Spree
+    adapter = Riskified::Adapter::Spree
 
     def headers
       {
         "ACCEPT" => "application/vnd.riskified.com; version=2",
-        "X-RISKIFIED-SHOP-DOMAIN" => ENV["X-RISKIFIED-SHOP-DOMAIN"]
-        "X-RISKIFIED-HMAC-SHA256" => ENV["X-RISKIFIED-HMAC-SHA256"]
+        "X-RISKIFIED-SHOP-DOMAIN" => ENV["X_RISKIFIED_SHOP_DOMAIN"],
+        "X-RISKIFIED-HMAC-SHA256" => ENV["X_RISKIFIED_HMAC_SHA256"]
       }
     end
 
-    def initialize(response)
+    def initialize(response=nil)
       self
     end
 
@@ -50,5 +55,5 @@ module Riskified
         headers: headers
       )
     end
-
+  end
 end
