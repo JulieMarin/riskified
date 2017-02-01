@@ -2,6 +2,7 @@ require "riskified/version"
 require "dotenv"
 require "httparty"
 require "spree_core"
+require "openssl"
 
 Dotenv.load
 
@@ -17,57 +18,71 @@ module Riskified
     include HTTParty
     format :json
 
-    API_URL = "http://riskified.com"
-
-    base_uri API_URL
+    API_URL = "https://sandbox.riskified.com"
 
     def adapter
       Riskified::Adapter::Spree
     end
 
-    def headers
+    def headers(body)
       {
         "ACCEPT" => "application/vnd.riskified.com; version=2",
-        "X-RISKIFIED-SHOP-DOMAIN" => ENV["X_RISKIFIED_SHOP_DOMAIN"],
-        "X-RISKIFIED-HMAC-SHA256" => ENV["X_RISKIFIED_HMAC_SHA256"]
+        "X-RISKIFIED-SHOP-DOMAIN" => ENV["RISKIFIED_SHOP_DOMAIN"],
+        "X-RISKIFIED-HMAC-SHA256" => calc_hmac(body)
       }
     end
 
-    def initialize(response=nil)
+    def initialize(sandbox=true)
+      if sandbox
+        self.class.class_eval do
+          base_uri "https://sandbox.riskified.com"
+        end
+      end
       self
     end
 
     def create(order)
+      data = {order: adapter.new(order).as_json}
       post(
         "/api/create",
-        query: {order: adapter.new(order).as_json},
-        headers: headers
+        query: data,
+        headers: headers(data)
       )
     end
 
     def submit(order)
+      data = {order: adapter.new(order).as_json}
       post(
         "/api/submit",
-        query: {order: adapter.new(order).as_json},
-        headers: headers
+        query: data,
+        headers: headers(data)
       )
     end
 
     def update(order)
+      data = {order: adapter.new(order).as_json}
       post(
         "/api/create",
-        query: {order: adapter.new(order).as_json},
-        headers: headers
+        query: data,
+        headers: headers(data)
       )
     end
 
     # optional
     def checkout_denied(order, resp)
+      data = {checkout: adapter.new(order).as_checkout(resp).as_json}
       post(
         "/api/checkout_denied",
-        query: {checkout: adapter.new(order).as_checkout(resp).as_json},
-        headers: headers
+        query: data,
+        headers: headers(data)
       )
+    end
+
+    private
+
+    def calc_hmac(body)
+      digest = OpenSSL::Digest.new('sha256')
+      hmac = OpenSSL::HMAC.hexdigest(digest, ENV["RISKIFIED_AUTH_TOKEN"], body)
     end
   end
 end
