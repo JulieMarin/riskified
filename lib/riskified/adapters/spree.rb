@@ -22,7 +22,7 @@ module Riskified::Adapter
 
     def adapt_line_items
       @order.line_items.map { |li|
-        LineItem.new(
+        Riskified::Adapter::LineItem.new(
           price: li.price.to_f,
           quantity: li.quantity,
           title: li.name,
@@ -42,7 +42,7 @@ module Riskified::Adapter
         .eligible
         .map {|a| a.source.promotion }
         .map {|p|
-          DiscountCode.new(
+          Riskified::Adapter::DiscountCode.new(
             amount: a.amount.to_f.abs,
             code: p.code
           )
@@ -53,7 +53,7 @@ module Riskified::Adapter
       @order.shipments.map {|s|
         shipping_rate = s.shipping_rates.select {|sr| sr.shipping_method_id == s.shipping_method.id}.first
 
-        ShippingLine.new(
+        Riskified::Adapter::ShippingLine.new(
           price: shipping_rate.cost.to_f,
           title: s.shipping_method.name
         )
@@ -76,7 +76,7 @@ module Riskified::Adapter
       p = first_completed_payment
       if p.source.is_a?(Spree::CreditCard)
         credit_card = p.source
-        CreditCardPaymentDetails.new(
+        Riskified::Adapter::CreditCardPaymentDetails.new(
           credit_card_bin: credit_card.bin,
           avs_result_code: p.avs_response,
           cvv_result_code: p.cvv_response_code,
@@ -85,7 +85,7 @@ module Riskified::Adapter
           )
       elsif p.source.is_a?(PAYPAL_SOURCE.constantize)
         paypal = p.source
-        PaypalPaymentDetails.new(
+        Riskified::Adapter::PaypalPaymentDetails.new(
           payer_email: paypal.payer_email,
           payer_status: paypal.payer_status,
           payer_address_status: paypal.payer_address_status,
@@ -104,7 +104,7 @@ module Riskified::Adapter
     def adapt_customer
       user = @order.user
       
-      Customer.new(
+      Riskified::Adapter::Customer.new(
         email: user.email,
         first_name: user.first_name,
         last_name: user.last_name,
@@ -117,7 +117,7 @@ module Riskified::Adapter
     end
 
     def adapt_address(address)
-      Address.new(
+      Riskified::Adapter::Address.new(
         first_name: address.firstname,
         last_name: address.lastname,
         address1: address.address1,
@@ -146,7 +146,7 @@ module Riskified::Adapter
     end
 
     def adapt
-      @adapted_order ||= Order.new(
+      @adapted_order ||= Riskified::Adapter::Order.new(
         id: @order.id,
         name: @order.name,
         email: @order.email,
@@ -154,7 +154,7 @@ module Riskified::Adapter
         currency: @order.currency,
         updated_at: @order.updated_at.to_datetime,
         gateway: gateway,
-        browser_ip: @order.current_sign_in_ip || @order.last_ip_address,
+        browser_ip: @order.last_ip_address,
         total_price: @order.total.to_f,
         total_discounts: @order.promo_total.to_f,
         note: @order.number,

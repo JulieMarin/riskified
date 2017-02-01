@@ -24,6 +24,13 @@ Or install it yourself as:
     $ require 'riskified'
     $ client = Riskified::Client.new
     $ resp = client.create(Spree::Order.last)
+    
+    # serialize spree order
+    $ o = Spree::Order.where.not(completed_at: nil).first
+    $ a = Riskfied::Adapter::Spree.new(o)
+    $ a.to_json 
+
+
 
 
 ## Development
