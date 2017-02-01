@@ -1,7 +1,9 @@
 require "riskified/version"
-require "dotenv/load"
+require "dotenv"
 require "httparty"
 require "spree_core"
+
+Dotenv.load
 
 autoload :Adapter, "riskified/adapter"
 autoload :BaseAdapter, "riskified/adapters/base"
