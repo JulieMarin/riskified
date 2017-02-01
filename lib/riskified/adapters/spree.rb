@@ -72,6 +72,10 @@ module Riskified::Adapter
       @order.payments.where(state: "completed").first
     end
 
+    def current_payment
+      @order.payments.order("created_at DESC").first
+    end
+
     def adapt_payment_details
       p = first_completed_payment
       if p.source.is_a?("Spree::CreditCard".constantize)
@@ -90,6 +94,24 @@ module Riskified::Adapter
           payer_status: paypal.payer_status,
           payer_address_status: paypal.payer_address_status,
           protection_eligibility: paypal.protection_eligibility
+          )
+      end
+    end
+
+    def adapt_payment_details_for_checkout(resp)
+      p = current_payment
+      if p.source.is_a?("Spree::CreditCard".constantize)
+        credit_card = p.source
+        Riskified::Adapter::CreditCardPaymentDetails.new(
+          credit_card_bin: credit_card.bin,
+          avs_result_code: p.avs_response,
+          cvv_result_code: p.cvv_response_code,
+          credit_card_number: cc_number(credit_card),
+          credit_card_company: credit_card.cc_type,
+          authorization_error: Riskified::Adapter::AuthorizationError.new(
+            created_at: Time.now.to_datetime, #todo
+            error_code: resp.params['message']
+            )
           )
       end
     end
@@ -168,6 +190,18 @@ module Riskified::Adapter
         billing_address: adapt_address(@order.billing_address),
         shipping_address: adapt_address(@order.shipping_address)
         )
+    end
+
+    def checkout_id
+      addr_id = @order.ship_address.id
+      payment_id = current_payment.id
+      "#{@order.id}-#{addr_id}-#{payment_id}"
+    end
+
+    def adapt_to_checkout(resp)
+      @checkout ||= adapt
+      @checkout.id = checkout_id
+      @checkout.payment_details = adapt_payment_details_for_checkout(resp)
     end
   end
 end

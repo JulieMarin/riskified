@@ -37,7 +37,7 @@ module Riskified
     def create(order)
       post(
         "/api/create",
-        query: adapter.new(order).to_json,
+        query: {order: adapter.new(order).to_json},
         headers: headers
       )
     end
@@ -45,7 +45,7 @@ module Riskified
     def submit(order)
       post(
         "/api/submit",
-        query: adapter.new(order).to_json,
+        query: {order: adapter.new(order).to_json},
         headers: headers
       )
     end
@@ -53,9 +53,18 @@ module Riskified
     def update(order)
       post(
         "/api/create",
-        query: adapter.new(order).to_json,
+        query: {order: adapter.new(order).to_json},
         headers: headers
       )
     end
+
+    # optional
+    def checkout_denied(order, resp)
+      checkout_error = gateway_error
+      post(
+        "/api/checkout_denied",
+        query: {checkout: adapter.new(order).adapt_to_checkout(resp).to_json},
+        headers: headers
+      )
   end
 end

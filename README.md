@@ -22,7 +22,7 @@ Or install it yourself as:
 
 ## Usage
     # send spree order to riskified
-    $ require 'riskified'
+    $ require 'riskified' # or add to gemfile
     $ client = Riskified::Client.new
     $ resp = client.create(Spree::Order.last)
     

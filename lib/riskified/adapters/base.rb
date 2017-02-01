@@ -3,11 +3,11 @@ module Riskified
     class Base
       def initialize(order)
         @order = order
-        adapt
+        @adapted_order ||= adapt
       end
 
       def to_json
-        adapt.as_json
+        @adapted_order.as_json
       end
     end
   end

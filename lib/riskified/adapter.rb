@@ -61,7 +61,7 @@ module Riskified
       :credit_card_number,
       :credit_card_company,
       :authorization_id, #optional
-      :authorization_error #optional
+      :authorization_error #optional AuthorizationError
       )
     PaypalPaymentDetails = Struct.new(
       :payer_email,
@@ -102,6 +102,11 @@ module Riskified
     ClientDetails = Struct.new(
       :accept_language, #optional
       :user_agent #optional
-      ) 
+      )
+    AuthorizationError = Struct.new(
+      :created_at,
+      :error_code,
+      :message #optional
+      )
   end
 end
