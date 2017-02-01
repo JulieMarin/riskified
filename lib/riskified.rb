@@ -1,17 +1,19 @@
 require "riskified/version"
-require 'dotenv/load'
+require "dotenv/load"
 require "httparty"
 
 module Riskified
   BRAND = "DSTLD"
+  DEFAULT_REFERRER = "www.dstld.com"
+
   class Client
     include HTTParty
     format :json
 
-    base_uri
+    API_URL = "http://riskified.com"
 
-    API_URL = "http://test.com"
-    ADAPTER = Adapter::Spree
+    base_uri API_URL
+    adapter = Adapter::Spree
 
     def headers
       {
@@ -26,25 +28,25 @@ module Riskified
     end
 
     def create(order)
-      HTTParty.post(
-        "#{API_URL}/api/create",
-        query: order.to_json,
+      post(
+        "/api/create",
+        query: adapter.new(order).to_json,
         headers: headers
       )
     end
 
     def submit(order)
-      HTTParty.post(
-        "#{API_URL}/api/submit",
-        query: order.to_json,
+      post(
+        "/api/submit",
+        query: adapter.new(order).to_json,
         headers: headers
       )
     end
 
     def update(order)
-      HTTParty.post(
-        "#{API_URL}/api/create",
-        query: order.to_json,
+      post(
+        "/api/create",
+        query: adapter.new(order).to_json,
         headers: headers
       )
     end

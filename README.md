@@ -21,8 +21,10 @@ Or install it yourself as:
     $ gem install riskified
 
 ## Usage
+    $ require 'riskified'
+    $ client = Riskified::Client.new
+    $ resp = client.create(Spree::Order.last)
 
-TODO: Write usage instructions here
 
 ## Development
 
