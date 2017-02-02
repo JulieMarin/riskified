@@ -155,12 +155,12 @@ module Riskified::Adapter
         address1: address.address1,
         address2: address.address2,
         company: address.company,
-        country: address.country.name,
+        country: address.country.try(:name),
         country_code: address.country.iso,
         phone: address.phone,
         city: address.city,
-        province: address.state.name,
-        province_code: address.state.abbr,
+        province: address.state.try(:name),
+        province_code: address.state.try(:abbr),
         zip: address.zipcode
         )
     end
