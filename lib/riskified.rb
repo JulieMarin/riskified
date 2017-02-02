@@ -89,8 +89,6 @@ module Riskified
       )
     end
 
-    private
-
     def calc_hmac(body)
       hmac = OpenSSL::HMAC.hexdigest('SHA256', ENV["RISKIFIED_AUTH_TOKEN"], body)
     end
