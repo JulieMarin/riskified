@@ -17,7 +17,7 @@ module Riskified::Adapter
       line_item.product.taxons.order("depth #{depth_order}")
         .limit(2).reduce('') {|x, i|
           x + ' ' + i.name
-        }.strip
+        }.strip.split(' ').uniq.join(' ')
     end
 
     def adapt_line_items
@@ -55,7 +55,8 @@ module Riskified::Adapter
 
         Riskified::Adapter::ShippingLine.new(
           price: shipping_rate.cost.to_f,
-          title: s.shipping_method.name
+          title: s.shipping_method.name,
+          code:  s.shipping_method.admin_name
         )
       }
     end
