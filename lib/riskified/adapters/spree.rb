@@ -38,15 +38,13 @@ module Riskified::Adapter
 
     def adapt_discount_codes
       @order.adjustments
-        .where(source_type: ['Spree::PromotionAction'])
+        .where()
         .eligible
         .map {|a| 
           promo = if a.source.present? && a.source_type == "Spree::StoreCredit" && a.gift_card_id
             OpenStruct.new(code: "GiftCard".constantize.find(a.gift_card_id).code)
-          elsif a.source.promotion.present?
+          elsif a.source_type == "Spree::PromotionAction"
             a.source.promotion
-          else
-            OpenStruct.new(code: nil)
           end
           {
           adj: a,
