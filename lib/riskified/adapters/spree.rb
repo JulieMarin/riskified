@@ -201,10 +201,19 @@ module Riskified::Adapter
       end
     end
 
+    def adapt_device_type
+      return nil unless @order.device_type
+      if @order.device_type == "mobile"
+        "mobile"
+      else
+        "web"
+      end
+    end
+
     def adapt
       @adapted_order ||= Riskified::Adapter::Order.new(
         id: @order.id,
-        name: @order.name,
+        name: @order.number,
         email: @order.email,
         created_at: @order.created_at.to_datetime,
         currency: @order.currency,
@@ -222,7 +231,9 @@ module Riskified::Adapter
         customer: adapt_customer,
         billing_address: adapt_address(@order.billing_address),
         shipping_address: adapt_address(@order.shipping_address),
-        checkout_id: checkout_id
+        checkout_id: checkout_id,
+        source: adapt_device_type,
+        cart_token: @order.guest_token
         )
     end
 
