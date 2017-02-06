@@ -141,6 +141,20 @@ module Riskified::Adapter
       first_purchase.completed_at.to_datetime if first_purchase.present?
     end
 
+    def adapt_customer_social(user)
+      if user.services.any?
+        user.services.map {|s| 
+          public_username = s.provider == "google" ? s.info.email : s.info.name
+          Riskified::Adapter::Social.new(
+            network: s.provider,
+            public_username: public_username,
+            email: s.info.email,
+            id: s.uid
+          )
+        }
+      end
+    end
+
     def adapt_customer
       user = @order.user
       
@@ -152,7 +166,8 @@ module Riskified::Adapter
         created_at: user.created_at.to_datetime,
         first_purchase_at: first_purchase_at(user), #optional
         orders_count: user.orders.where(state: "completed").count,
-        verified_email: user.confirmed_at.present?
+        verified_email: user.confirmed_at.present?,
+        social: adapt_customer_social(user)
         )
     end
 
