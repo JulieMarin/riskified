@@ -90,7 +90,6 @@ module Riskified
     Social = KeywordStruct.new(
       :network,
       :public_username,
-      :account_url,
       :email,
       :id
       )
