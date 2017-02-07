@@ -107,6 +107,13 @@ module Riskified
       :province_code, #optional
       :zip #optional
       )
+    BillingAddress = KeywordStruct.new(
+      :first_name,
+      :last_name,
+      :country,
+      :country_code,
+      :zip
+      )
     ClientDetails = KeywordStruct.new(
       :accept_language, #optional
       :user_agent #optional

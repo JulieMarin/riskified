@@ -171,22 +171,32 @@ module Riskified::Adapter
         )
     end
 
-    def adapt_address(address)
+    def adapt_address(address, type = :shipping)
       return nil if address.nil?
-      Riskified::Adapter::Address.new(
-        first_name: address.firstname,
-        last_name: address.lastname,
-        address1: address.address1,
-        address2: address.address2,
-        company: address.company,
-        country: address.country.try(:name),
-        country_code: address.country.iso,
-        phone: address.phone,
-        city: address.city,
-        province: address.state.try(:name),
-        province_code: address.state.try(:abbr),
-        zip: address.zipcode
-        )
+      if type == :billing
+        Riskified::Adapter::BillingAddress.new(
+          first_name: address.firstname,
+          last_name: address.lastname,
+          country: address.country.try(:name),
+          country_code: address.country.iso,
+          zip: address.zipcode
+          )
+      else
+        Riskified::Adapter::Address.new(
+          first_name: address.firstname,
+          last_name: address.lastname,
+          address1: address.address1,
+          address2: address.address2,
+          company: address.company,
+          country: address.country.try(:name),
+          country_code: address.country.iso,
+          phone: address.phone,
+          city: address.city,
+          province: address.state.try(:name),
+          province_code: address.state.try(:abbr),
+          zip: address.zipcode
+          )
+      end
     end
 
     def referring_site
@@ -229,7 +239,7 @@ module Riskified::Adapter
         shipping_lines: adapt_shipping_lines,
         payment_details: adapt_payment_details,
         customer: adapt_customer,
-        billing_address: adapt_address(@order.billing_address),
+        billing_address: adapt_address(@order.billing_address, :billing),
         shipping_address: adapt_address(@order.shipping_address),
         checkout_id: checkout_id,
         source: adapt_device_type,
