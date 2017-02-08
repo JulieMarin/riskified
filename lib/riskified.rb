@@ -17,12 +17,11 @@ module Riskified
     format :json
 
     @@sandbox_mode = true
-    @@adapter = "Riskified::Adapter::Spree"
 
     API_URL = @@sandbox_mode == true ? "https://sandbox.riskified.com" : "https://wh.riskified.com"
 
     def adapter
-      @@adapter.constantize
+      @@adapter
     end
 
     def headers(body)
