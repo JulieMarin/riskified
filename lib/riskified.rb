@@ -7,7 +7,6 @@ Dotenv.load
 
 require "riskified/adapter"
 require "riskified/adapters/base"
-require "riskified/adapters/spree"
 
 module Riskified
   BRAND = ""

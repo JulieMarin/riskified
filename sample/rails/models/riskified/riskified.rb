@@ -1,5 +1,8 @@
 module Riskified
-  BRAND = "Your Brand Here"
+  BRAND = "Your Brand"
   DEFAULT_REFERRER = "www.brand.com"
-  SANDBOX_MODE = !Rails.env.production?
+  class Client
+    SANDBOX_MODE = !Rails.env.production?
+    ADAPTER = "Riskified::Adapter::Spree"
+  end
 end
