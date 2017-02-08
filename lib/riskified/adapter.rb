@@ -131,7 +131,8 @@ module Riskified
       :last_name,
       :country,
       :country_code,
-      :zip
+      :zip,
+      :phone
       )
     ClientDetails = KeywordStruct.new(
       :accept_language, #optional
