@@ -11,7 +11,7 @@ module Riskified::Adapter
     end
 
     def requires_shipping(product)
-      determine_product_type(li.product) == "physical"
+      determine_product_type(product) == "physical"
     end
 
     def line_item_category(line_item, depth_order = "ASC")
@@ -203,7 +203,7 @@ module Riskified::Adapter
         )
     end
 
-    def adapt_address(address, type = :shipping)
+    def adapt_address(address, type = :shipping, order = nil)
       return nil if address.nil?
       if type == :billing
         Riskified::Adapter::BillingAddress.new(
@@ -211,7 +211,8 @@ module Riskified::Adapter
           last_name: address.lastname,
           country: address.country.try(:name),
           country_code: address.country.iso,
-          zip: address.zipcode
+          zip: address.zipcode,
+          phone: (order.present? ? order.ship_address.phone : address.phone)
           )
       else
         Riskified::Adapter::Address.new(
@@ -271,7 +272,7 @@ module Riskified::Adapter
         shipping_lines: adapt_shipping_lines,
         payment_details: adapt_payment_details,
         customer: adapt_customer,
-        billing_address: adapt_address(@order.billing_address, :billing),
+        billing_address: adapt_address(@order.billing_address, :billing, @order),
         shipping_address: adapt_address(@order.shipping_address),
         checkout_id: checkout_id,
         source: adapt_device_type,
