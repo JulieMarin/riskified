@@ -1,7 +1,6 @@
 require "riskified/version"
 require "dotenv"
 require "httparty"
-require "spree_core"
 require "openssl"
 
 Dotenv.load
@@ -11,19 +10,26 @@ require "riskified/adapters/base"
 require "riskified/adapters/spree"
 
 module Riskified
-  BRAND = "DSTLD"
-  DEFAULT_REFERRER = "www.dstld.com"
+  BRAND = ""
+  DEFAULT_REFERRER = ""
 
   class Client
     include HTTParty
     format :json
 
-    API_URL = "https://sandbox.riskified.com"
+    SANDBOX_MODE = true
+    ADAPTER = "Riskified::Adapter::Spree"
 
-    base_uri API_URL
+    def API_URL
+      if SANDBOX_MODE == true
+        "https://sandbox.riskified.com"
+      else
+        "https://wh.riskified.com"
+      end
+    end
 
     def adapter
-      Riskified::Adapter::Spree
+      ADAPTER.constantize
     end
 
     def headers(body)
@@ -35,11 +41,9 @@ module Riskified
       }
     end
 
-    def initialize(sandbox=true)
-      if sandbox == false
-        self.class.class_eval do
-          base_uri "https://production.riskified.com"
-        end
+    def initialize
+      self.class.class_eval do
+        base_uri API_URL
       end
       self
     end

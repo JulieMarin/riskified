@@ -31,7 +31,19 @@ Or install it yourself as:
     # serialize spree order to Riskified API format
     $ o = Spree::Order.where.not(completed_at: nil).last
     $ a = Riskified::Adapter::Spree.new(o)
-    $ a.to_json 
+    $ a.to_json
+    
+    # Use with rails
+    Look at the sample/rails folder
+    
+    # Riskified gem settings in spree app
+    # /models/riskified/riskified.rb
+    module Riskified
+      BRAND = "DSTLD"
+      DEFAULT_REFERRER = "www.dstld.com"
+      SANDBOX_MODE = !Rails.env.production?
+    end
+
 
 
 

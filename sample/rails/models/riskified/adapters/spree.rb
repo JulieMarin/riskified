@@ -1,6 +1,6 @@
 module Riskified::Adapter
   class Spree < Base
-    PAYPAL_SOURCE = "Spree::PaypalExpressCheckout"
+    PAYPAL_SOURCE = Spree::PaypalExpressCheckout
 
     def determine_product_type(product)
       if product.name.downcase.include?("gift card")
@@ -58,7 +58,7 @@ module Riskified::Adapter
         .eligible
         .map {|a| 
           promo = if a.source_type == "Spree::StoreCredit" && a.gift_card_id
-            OpenStruct.new(code: "GiftCard".constantize.find(a.gift_card_id).code)
+            OpenStruct.new(code: GiftCard.find(a.gift_card_id).code)
           elsif a.source_type == "Spree::PromotionAction"
             a.source.promotion
           end
@@ -105,7 +105,7 @@ module Riskified::Adapter
     def adapt_payment_details
       p = first_completed_payment
       return nil unless p
-      if p.source.is_a?("Spree::CreditCard".constantize)
+      if p.source.is_a?(Spree::CreditCard)
         credit_card = p.source
         Riskified::Adapter::CreditCardPaymentDetails.new(
           credit_card_bin: credit_card.bin,
@@ -114,7 +114,7 @@ module Riskified::Adapter
           credit_card_number: cc_number(credit_card),
           credit_card_company: credit_card.cc_type
           )
-      elsif p.source.is_a?(Riskified::Adapter::Spree::PAYPAL_SOURCE.constantize)
+      elsif p.source.is_a?(Riskified::Adapter::Spree::PAYPAL_SOURCE)
         paypal = p.source
         Riskified::Adapter::PaypalPaymentDetails.new(
           payer_email: paypal.payer_email,
@@ -135,7 +135,7 @@ module Riskified::Adapter
 
     def adapt_payment_details_for_checkout(resp)
       p = current_payment
-      if p.source.is_a?("Spree::CreditCard".constantize)
+      if p.source.is_a?(Spree::CreditCard)
         credit_card = p.source
         Riskified::Adapter::CreditCardPaymentDetails.new(
           credit_card_bin: credit_card.bin,
