@@ -23,10 +23,10 @@ Or install it yourself as:
 ## Usage
 send spree order to riskified
 ```ruby
-require 'riskified' # or add to gemfile```
-client = Riskified::Client.new```
-o = Spree::Order.where.not(completed_at: nil).last```
-resp = client.create(o)```
+require 'riskified' # or add to gemfile
+client = Riskified::Client.new
+o = Spree::Order.where.not(completed_at: nil).last
+resp = client.create(o)
 # => {"order"=>{"status"=>"submitted", "id"=>"123", "description"=>"Under review by Riskified"}}
 ```
     
