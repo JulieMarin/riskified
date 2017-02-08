@@ -50,7 +50,25 @@ module Riskified
       :category,
       :sub_category, #optional
       :brand,
-      :product_type
+      :product_type,
+      :requires_shipping, #optional
+      )
+    LineItemDigitalGoods = KeywordStruct.new(
+      :price,
+      :quantity,
+      :title,
+      :product_id,
+      :sku, #optional
+      :category,
+      :sub_category, #optional
+      :brand,
+      :product_type,
+      :requires_shipping, #optional
+      :sender_name,
+      :photo_uploaded,
+      :photo_url,
+      :message
+      :recipient, # [Recipient]
       )
     DiscountCode = KeywordStruct.new(
       :amount,
@@ -90,6 +108,7 @@ module Riskified
     Social = KeywordStruct.new(
       :network,
       :public_username,
+      :account_url,
       :email,
       :id
       )
@@ -122,6 +141,9 @@ module Riskified
       :created_at,
       :error_code,
       :message #optional
+      )
+    Recipient = KeywordStruct.new(
+      :email
       )
   end
 end

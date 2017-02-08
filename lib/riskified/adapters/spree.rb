@@ -10,6 +10,10 @@ module Riskified::Adapter
       end
     end
 
+    def requires_shipping(product)
+      determine_product_type(li.product) == "physical"
+    end
+
     def line_item_category(line_item, depth_order = "ASC")
       if depth_order == "DESC"
         return nil unless line_item.product.taxons.length > 3
@@ -22,7 +26,7 @@ module Riskified::Adapter
 
     def adapt_line_items
       @order.line_items.map { |li|
-        Riskified::Adapter::LineItem.new(
+        attrs = {
           price: li.price.to_f,
           quantity: li.quantity,
           title: li.name,
@@ -31,8 +35,21 @@ module Riskified::Adapter
           category: line_item_category(li), 
           sub_category: line_item_category(li, "DESC"),
           brand: Riskified::BRAND,
-          product_type: determine_product_type(li.product)
-          )
+          product_type: determine_product_type(li.product),
+          requires_shipping: requires_shipping(li.product)
+        }
+        if determine_product_type(li.product) == "digital" && li.gift_card.present?
+          gc = li.gift_card
+          Riskified::Adapter::LineItemDigitalGoods.new(attrs.merge({
+            sender_name: gc.from_name,
+            photo_uploaded: false,
+            photo_url: nil,
+            message: gc.message,
+            recipient: Riskified::Adapter::Recipient.new(email: gc.to_email)
+            }))
+        else
+          Riskified::Adapter::LineItem.new(attrs)
+        end
       }
     end
 
@@ -145,12 +162,27 @@ module Riskified::Adapter
       if user.services.any?
         user.services.map {|s| 
           public_username = s.provider == "google" ? s.info.email : s.info.name
-          Riskified::Adapter::Social.new(
-            network: s.provider,
-            public_username: public_username,
-            email: s.info.email,
-            id: s.uid
-          )
+          if s.provider == "facebook"
+            account_url = if s.info.link.present?
+              s.info.link
+            else
+              "https://www.facebook.com/app_scoped_user_id/#{s.uid}"
+            end
+            Riskified::Adapter::Social.new(
+              network: s.provider,
+              public_username: public_username,
+              account_url: account_url,
+              email: s.info.email,
+              id: s.uid
+            )
+          else
+            Riskified::Adapter::Social.new(
+              network: s.provider,
+              public_username: public_username,
+              email: s.info.email,
+              id: s.uid
+            )
+          end
         }
       end
     end
