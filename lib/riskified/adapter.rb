@@ -67,8 +67,8 @@ module Riskified
       :sender_name,
       :photo_uploaded,
       :photo_url,
-      :message
-      :recipient, # [Recipient]
+      :message,
+      :recipient # [Recipient]
       )
     DiscountCode = KeywordStruct.new(
       :amount,
