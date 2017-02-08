@@ -24,7 +24,7 @@ module Riskified
     
     format :json
 
-    API_URL = @@sandbox_mode == true ? "https://sandbox.riskified.com" : "https://wh.riskified.com"
+    API_URL = @sandbox_mode == true ? "https://sandbox.riskified.com" : "https://wh.riskified.com"
 
     def headers(body)
       {
