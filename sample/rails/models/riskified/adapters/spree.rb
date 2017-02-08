@@ -1,6 +1,6 @@
 module Riskified::Adapter
   class Spree < Base
-    PAYPAL_SOURCE = Spree::PaypalExpressCheckout
+    PAYPAL_SOURCE = "Spree::PaypalExpressCheckout"
 
     def determine_product_type(product)
       if product.name.downcase.include?("gift card")
@@ -34,7 +34,7 @@ module Riskified::Adapter
           sku: li.sku,
           category: line_item_category(li), 
           sub_category: line_item_category(li, "DESC"),
-          brand: Riskified::BRAND,
+          brand: Riskified.class_variable_get(:@@brand),
           product_type: determine_product_type(li.product),
           requires_shipping: requires_shipping(li.product)
         }
@@ -105,16 +105,16 @@ module Riskified::Adapter
     def adapt_payment_details
       p = first_completed_payment
       return nil unless p
-      if p.source.is_a?(Spree::CreditCard)
+      if p.source.is_a?("Spree::CreditCard".constantize)
         credit_card = p.source
         Riskified::Adapter::CreditCardPaymentDetails.new(
           credit_card_bin: credit_card.bin,
-          avs_result_code: p.avs_response,
-          cvv_result_code: p.cvv_response_code,
+          avs_result_code: "I, M", # p.avs_response
+          cvv_result_code: "M", #p.cvv_response_code,
           credit_card_number: cc_number(credit_card),
           credit_card_company: credit_card.cc_type
           )
-      elsif p.source.is_a?(Riskified::Adapter::Spree::PAYPAL_SOURCE)
+      elsif p.source.is_a?(Riskified::Adapter::Spree::PAYPAL_SOURCE.constantize)
         paypal = p.source
         Riskified::Adapter::PaypalPaymentDetails.new(
           payer_email: paypal.payer_email,
@@ -135,7 +135,7 @@ module Riskified::Adapter
 
     def adapt_payment_details_for_checkout(resp)
       p = current_payment
-      if p.source.is_a?(Spree::CreditCard)
+      if p.source.is_a?("Spree::CreditCard".constantize)
         credit_card = p.source
         Riskified::Adapter::CreditCardPaymentDetails.new(
           credit_card_bin: credit_card.bin,
@@ -233,7 +233,7 @@ module Riskified::Adapter
     end
 
     def referring_site
-      Riskified::DEFAULT_REFERRER
+      Riskified.class_variable_get(:@@default_referrer)
     end
 
     def gateway
