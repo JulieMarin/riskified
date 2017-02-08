@@ -26,6 +26,10 @@ module Riskified
 
     API_URL = @sandbox_mode == true ? "https://sandbox.riskified.com" : "https://wh.riskified.com"
 
+    def adapter
+      self.class.adapter
+    end
+
     def headers(body)
       {
         "Content-Type" => "application/json",

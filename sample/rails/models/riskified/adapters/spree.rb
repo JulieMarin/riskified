@@ -34,7 +34,7 @@ module Riskified::Adapter
           sku: li.sku,
           category: line_item_category(li), 
           sub_category: line_item_category(li, "DESC"),
-          brand: Riskified.class_variable_get(:@@brand),
+          brand: Riskified.brand,
           product_type: determine_product_type(li.product),
           requires_shipping: requires_shipping(li.product)
         }
@@ -233,7 +233,7 @@ module Riskified::Adapter
     end
 
     def referring_site
-      Riskified.class_variable_get(:@@default_referrer)
+      Riskified.default_referrer
     end
 
     def gateway

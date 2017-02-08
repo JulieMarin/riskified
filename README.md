@@ -43,7 +43,7 @@ Look at the sample/rails folder
 
 # Riskified gem settings in spree app
 # /config/initializers/riskified.rb
-require_relative "app/models/riskified/adapters/spree.rb"
+require_relative "../../app/models/riskified/adapters/spree.rb"
 
 Riskified.brand = "DSTLD"
 Riskified.default_referrer = "www.dstld.com"
