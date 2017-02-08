@@ -9,20 +9,22 @@ require "riskified/adapter"
 require "riskified/adapters/base"
 
 module Riskified
-  @@brand = ""
-  @@default_referrer = ""
+  class << self
+    attr_accessor :brand
+    attr_accessor :default_referrer
+  end
 
   class Client
+    class << self
+      attr_accessor :sandbox_mode
+      attr_accessor :adapter
+    end
+
     include HTTParty
+    
     format :json
 
-    @@sandbox_mode = true
-
     API_URL = @@sandbox_mode == true ? "https://sandbox.riskified.com" : "https://wh.riskified.com"
-
-    def adapter
-      @@adapter
-    end
 
     def headers(body)
       {

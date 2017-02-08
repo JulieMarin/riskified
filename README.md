@@ -42,12 +42,13 @@ a.to_json
 Look at the sample/rails folder
 
 # Riskified gem settings in spree app
-# /models/riskified/riskified.rb
-module Riskified
-  BRAND = "DSTLD"
-  DEFAULT_REFERRER = "www.dstld.com"
-  SANDBOX_MODE = !Rails.env.production?
-end
+# /config/initializers/riskified.rb
+require_relative "app/models/riskified/adapters/spree.rb"
+
+Riskified.brand = "DSTLD"
+Riskified.default_referrer = "www.dstld.com"
+Riskified::Client.sandbox_mode = !Rails.env.production?
+Riskified::Client.adapter = Riskified::Adapter::Spree
 ```
 
 ## Required env variables
