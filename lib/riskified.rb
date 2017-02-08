@@ -30,6 +30,13 @@ module Riskified
       self.class.adapter
     end
 
+    def initialize
+      self.class.class_eval do
+        base_uri API_URL
+      end
+      self
+    end
+
     def headers(body)
       {
         "Content-Type" => "application/json",
@@ -39,56 +46,41 @@ module Riskified
       }
     end
 
-    def initialize
-      self.class.class_eval do
-        base_uri API_URL
-      end
-      self
+    def post(path, data)
+      self.class.post(
+        path,
+        body: data,
+        headers: headers(data)
+      )
     end
 
     def adapt_order(order)
       adapter.new(order).as_json
     end
 
-    def adapt_checkout(order)
+    def adapt_checkout(order, resp)
       adapter.new(order).as_checkout(resp).as_json
     end
 
     def create(order)
       data = {order: adapt_order(order)}.to_json
-      self.class.post(
-        "/api/create",
-        body: data,
-        headers: headers(data)
-      )
+      post("/api/create", data)
     end
 
     def submit(order)
       data = {order: adapt_order(order)}.to_json
-      self.class.post(
-        "/api/submit",
-        body: data,
-        headers: headers(data)
-      )
+      post("/api/submit", data)
     end
 
     def update(order)
       data = {order: adapt_order(order)}.to_json
-      self.class.post(
-        "/api/create",
-        body: data,
-        headers: headers(data)
-      )
+      post("/api/create", data)
     end
 
     # optional
     def checkout_denied(order, resp)
-      data = {checkout: adapt_checkout(order)}.to_json
-      self.class.post(
-        "/api/checkout_denied",
-        body: data,
-        headers: headers(data)
-      )
+      data = {checkout: adapt_checkout(order, resp)}.to_json
+      post("/api/checkout_denied", data)
     end
 
     def calc_hmac(body)
