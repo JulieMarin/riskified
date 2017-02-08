@@ -19,13 +19,7 @@ module Riskified
     SANDBOX_MODE = true
     ADAPTER = "Riskified::Adapter::Spree"
 
-    def API_URL
-      if SANDBOX_MODE == true
-        "https://sandbox.riskified.com"
-      else
-        "https://wh.riskified.com"
-      end
-    end
+    API_URL = SANDBOX_MODE == true ? "https://sandbox.riskified.com" : "https://wh.riskified.com"
 
     def adapter
       ADAPTER.constantize
