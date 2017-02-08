@@ -1,6 +1,6 @@
 # Riskified
 
-Use riskified with Ruby and Spree. Don't want to use this with Spree? Make your own adapter in `riskified/adapters/`.
+Use Riskified with Ruby. Sample shows use with Rails and Spree.
 
 TODO: test
 
@@ -21,31 +21,38 @@ Or install it yourself as:
     $ gem install riskified
 
 ## Usage
-    # send spree order to riskified
-    $ require 'riskified' # or add to gemfile
-    $ client = Riskified::Client.new
-    $ o = Spree::Order.where.not(completed_at: nil).last
-    $ resp = client.create(o)
-    # => {"order"=>{"status"=>"submitted", "id"=>"123", "description"=>"Under review by Riskified"}}
+send spree order to riskified
+```ruby
+require 'riskified' # or add to gemfile```
+client = Riskified::Client.new```
+o = Spree::Order.where.not(completed_at: nil).last```
+resp = client.create(o)```
+# => {"order"=>{"status"=>"submitted", "id"=>"123", "description"=>"Under review by Riskified"}}
+```
     
-    # serialize spree order to Riskified API format
-    $ o = Spree::Order.where.not(completed_at: nil).last
-    $ a = Riskified::Adapter::Spree.new(o)
-    $ a.to_json
-    
-    # Use with rails
-    Look at the sample/rails folder
-    
-    # Riskified gem settings in spree app
-    # /models/riskified/riskified.rb
-    module Riskified
-      BRAND = "DSTLD"
-      DEFAULT_REFERRER = "www.dstld.com"
-      SANDBOX_MODE = !Rails.env.production?
-    end
+serialize spree order to Riskified API format
+```ruby
+o = Spree::Order.where.not(completed_at: nil).last
+a = Riskified::Adapter::Spree.new(o)
+a.to_json
+```
 
+## Use with Rails
+```ruby
+Look at the sample/rails folder
 
+# Riskified gem settings in spree app
+# /models/riskified/riskified.rb
+module Riskified
+  BRAND = "DSTLD"
+  DEFAULT_REFERRER = "www.dstld.com"
+  SANDBOX_MODE = !Rails.env.production?
+end
+```
 
+## Required env variables
+    RISKIFIED_SHOP_DOMAIN = www.brand.com
+    RISKIFIED_AUTH_TOKEN = sha256 auth hash from riskified
 
 
 ## Development
