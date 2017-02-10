@@ -61,6 +61,8 @@ module Riskified::Adapter
             OpenStruct.new(code: GiftCard.find(a.gift_card_id).code)
           elsif a.source_type == "Spree::PromotionAction"
             a.source.promotion
+          else
+             OpenStruct.new(code: nil)
           end
           {
           adj: a,
@@ -78,11 +80,13 @@ module Riskified::Adapter
       @order.shipments.map {|s|
         shipping_rate = s.shipping_rates.select {|sr| sr.shipping_method_id == s.shipping_method.id}.first
 
-        Riskified::Adapter::ShippingLine.new(
-          price: shipping_rate.cost.to_f,
-          title: s.shipping_method.name,
-          code:  s.shipping_method.admin_name
-        )
+        if s.shipping_method.present?
+          Riskified::Adapter::ShippingLine.new(
+            price: shipping_rate.present? ? shipping_rate.cost.to_f : 0.0,
+            title: s.shipping_method.name,
+            code:  s.shipping_method.admin_name
+          )
+        end
       }
     end
 
@@ -135,6 +139,7 @@ module Riskified::Adapter
 
     def adapt_payment_details_for_checkout(resp)
       p = current_payment
+      return nil unless p
       if p.source.is_a?("Spree::CreditCard".constantize)
         credit_card = p.source
         Riskified::Adapter::CreditCardPaymentDetails.new(
@@ -189,7 +194,7 @@ module Riskified::Adapter
 
     def adapt_customer
       user = @order.user
-      
+      return nil unless user
       Riskified::Adapter::Customer.new(
         email: user.email,
         first_name: user.first_name,
@@ -212,7 +217,7 @@ module Riskified::Adapter
           country: address.country.try(:name),
           country_code: address.country.iso,
           zip: address.zipcode,
-          phone: (order.present? ? order.ship_address.phone : address.phone)
+          phone: (order.present? ? order.ship_address.try(:phone) : address.try(:phone))
           )
       else
         Riskified::Adapter::Address.new(
@@ -280,10 +285,31 @@ module Riskified::Adapter
         )
     end
 
+    def with_decision_details
+      @adapted_order = adapt_order_with_decision_details(
+        Riskified::Tools::DecisionDetailRetriever.new(@order)
+        )
+      as_json
+    end
+
+    def adapt_order_with_decision_details(decision_details)
+      @adapted_order ||= adapt
+      @adapted_order.decision = Riskified::Adapter::DecisionDetails.new(
+        external_status: decision_details.external_status,
+        decided_at: decision_details.decided_at,
+        reason: decision_details.reason
+        )
+      @adapted_order
+    end
+
     def checkout_id
-      addr_id = @order.ship_address.id
-      payment_id = current_payment.id
-      "#{@order.id}-#{addr_id}-#{payment_id}"
+      addr_id = @order.ship_address.try(:id)
+      payment_id = current_payment.try(:id)
+      if addr_id && payment_id
+        "#{@order.id}-#{addr_id}-#{payment_id}"
+      else
+        @order.id.to_s
+      end
     end
 
     def as_checkout(resp)

@@ -146,5 +146,10 @@ module Riskified
     Recipient = KeywordStruct.new(
       :email
       )
+    DecisionDetails = KeywordStruct.new(
+      :external_status,
+      :decided_at,
+      :reason
+    )
   end
 end

@@ -58,6 +58,10 @@ module Riskified
       adapter.new(order).as_json
     end
 
+    def adapt_order_with_decision_details(order)
+      adapter.new(order).with_decision_details.as_json
+    end
+
     def adapt_checkout(order, resp)
       adapter.new(order).as_checkout(resp).as_json
     end
@@ -75,6 +79,15 @@ module Riskified
     def update(order)
       data = {order: adapt_order(order)}.to_json
       post("/api/create", data)
+    end
+
+    def historical(orders)
+      data = {
+        orders: orders.map {|o|
+          adapt_order_with_decision_details(o).to_json
+        }
+      }.to_json
+      post("/api/historical", data)
     end
 
     # optional

@@ -1,0 +1,6 @@
+---
+- order_number: RXXXXXX123
+  external_status: chargeback_fraud
+  chargeback_date: 1/1/17
+  chargeback_reason: No Cardholder Authorization - Cardholder does not authorize
+    the transaction
