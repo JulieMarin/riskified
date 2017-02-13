@@ -84,7 +84,7 @@ module Riskified
     def historical(orders)
       data = {
         orders: orders.map {|o|
-          adapt_order_with_decision_details(o).to_json
+          adapt_order_with_decision_details(o).as_json
         }
       }.to_json
       post("/api/historical", data)
@@ -94,6 +94,10 @@ module Riskified
     def checkout_denied(order, resp)
       data = {checkout: adapt_checkout(order, resp)}.to_json
       post("/api/checkout_denied", data)
+    end
+
+    def cancel(order)
+      post("/api/cancel", adapter.new(order).cancellation_data.to_json)
     end
 
     def calc_hmac(body)
