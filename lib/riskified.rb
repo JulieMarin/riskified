@@ -105,8 +105,8 @@ module Riskified
       post("/api/cancel", adapter.new(order).cancellation_data.to_json)
     end
 
-    def refund(reimb)
-      post("/api/refund", refund_serializer.new(order).to_json)
+    def refund(r)
+      post("/api/refund", refund_serializer.new(r).to_json)
     end
 
     def calc_hmac(body)
