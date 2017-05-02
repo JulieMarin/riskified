@@ -18,10 +18,11 @@ module Riskified
     class << self
       attr_accessor :sandbox_mode
       attr_accessor :adapter
+      attr_accessor :refund_serializer
     end
 
     include HTTParty
-    
+
     format :json
 
     API_URL = @sandbox_mode == true ? "https://sandbox.riskified.com" : "https://wh.riskified.com"
@@ -84,10 +85,10 @@ module Riskified
     def historical(orders)
       data = {
         orders: orders.map {|o|
-          adapt_order_with_decision_details(o).as_json
+          adapt_order_with_decision_details(o)
         }
-      }.to_json
-      post("/api/historical", data)
+      }.as_json
+      post("/api/historical", data.to_json)
     end
 
     # optional
@@ -98,6 +99,10 @@ module Riskified
 
     def cancel(order)
       post("/api/cancel", adapter.new(order).cancellation_data.to_json)
+    end
+
+    def refund(reimb)
+      post("/api/refund", refund_serializer.new(order).to_json)
     end
 
     def calc_hmac(body)

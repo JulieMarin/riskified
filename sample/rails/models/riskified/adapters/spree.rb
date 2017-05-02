@@ -243,7 +243,7 @@ module Riskified::Adapter
 
     def gateway
       if first_completed_payment
-        first_completed_payment.payment_method.name
+        first_completed_payment.payment_method.try(:name)
       else
         nil
       end
