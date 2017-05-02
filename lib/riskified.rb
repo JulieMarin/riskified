@@ -31,6 +31,10 @@ module Riskified
       self.class.adapter
     end
 
+    def refund_serializer
+      self.class.refund_serializer
+    end
+
     def initialize
       self.class.class_eval do
         base_uri API_URL
