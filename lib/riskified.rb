@@ -25,7 +25,9 @@ module Riskified
 
     format :json
 
-    API_URL = @sandbox_mode == true ? "https://sandbox.riskified.com" : "https://wh.riskified.com"
+    def api_url
+      @sandbox_mode == true ? "https://sandbox.riskified.com" : "https://wh.riskified.com"
+    end
 
     def adapter
       self.class.adapter
@@ -37,7 +39,7 @@ module Riskified
 
     def initialize
       self.class.class_eval do
-        base_uri API_URL
+        base_uri api_url
       end
       self
     end
