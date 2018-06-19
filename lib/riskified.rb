@@ -19,15 +19,15 @@ module Riskified
       attr_accessor :sandbox_mode
       attr_accessor :adapter
       attr_accessor :refund_serializer
+
+      def api_url
+        @sandbox_mode == true ? "https://sandbox.riskified.com" : "https://wh.riskified.com"
+      end
     end
 
     include HTTParty
 
     format :json
-
-    def api_url
-      @sandbox_mode == true ? "https://sandbox.riskified.com" : "https://wh.riskified.com"
-    end
 
     def adapter
       self.class.adapter
